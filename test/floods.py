@@ -2,7 +2,7 @@ from scapy.all import IP,ICMP,send,TCP,UDP,Raw
 import time as t
 
 def icmp_dump(ip,duration):
-
+    #this 
     start_time = t.time() 
     icmp_packet = IP(dst=ip)/ICMP()
     print(f"Sending IMCP packets for {duration} secs\nSending...")
