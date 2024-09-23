@@ -36,8 +36,14 @@ while True:
     sniff(timeout =5,prn=process_packet, store=0)
     print("Done with one")
     # need to handle when there are 0 or 1 items for variance calculation 
-    time_variance = st.variance(time_list)
-    pakt_size = [st.mode(size_list),st.variance(size_list)]
+    if len(time_list>1):
+        time_variance = st.variance(time_list)
+    else: 
+        time_variance = 0
+    if len(pakt_size)>1:
+        pakt_size = [st.mode(size_list),st.variance(size_list)]
+    else:
+        pakt_size = [st.mode(size_list),0]
     print(f"dest ip : {dest_ips}\nsrc ips : {scr_ips}\ntimes : {time_variance}\nSizes : {pakt_size}")
     dest_ips.clear()
     scr_ips.clear()
