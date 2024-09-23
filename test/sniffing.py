@@ -43,7 +43,7 @@ while True:
         pakt_size = [st.mode(size_list),st.variance(size_list)]
     else:
         pakt_size = [0,0]
-    print(f"dest ip : {dest_ips}\nsrc ips : {scr_ips}\ntimes : {time_variance}\nSizes : {pakt_size}")
+    print(f"dest ip : {dest_ips}\nsrc ips : {scr_ips}\ntimes : {time_variance}\nSizes : {pakt_size}\nNo. of packets: {len(size_list)}")
     dest_ips.clear()
     scr_ips.clear()
     time_list.clear()
