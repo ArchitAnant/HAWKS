@@ -35,8 +35,7 @@ def process_packet(packet):
 while True:
     sniff(timeout =5,prn=process_packet, store=0)
     print("Done with one")
-    # need to handle when there are 0 or 1 items for variance calculation 
-    if len(time_list>1):
+    if len(time_list)>1:
         time_variance = st.variance(time_list)
     else: 
         time_variance = 0
