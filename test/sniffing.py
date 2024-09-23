@@ -39,10 +39,10 @@ while True:
         time_variance = st.variance(time_list)
     else: 
         time_variance = 0
-    if len(pakt_size)>1:
+    if len(size_list)>1:
         pakt_size = [st.mode(size_list),st.variance(size_list)]
     else:
-        pakt_size = [st.mode(size_list),0]
+        pakt_size = [0,0]
     print(f"dest ip : {dest_ips}\nsrc ips : {scr_ips}\ntimes : {time_variance}\nSizes : {pakt_size}")
     dest_ips.clear()
     scr_ips.clear()
