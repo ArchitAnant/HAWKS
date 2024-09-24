@@ -1,1 +1,2 @@
-scapy
+pandas==2.2.3
+scapy==2.5.0
