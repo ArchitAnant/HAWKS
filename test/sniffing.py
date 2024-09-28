@@ -56,7 +56,7 @@ def preprocess_single_input(input_row):
 
     # Step 5: Normalize the feature values using the global scaler
     # Assuming `scaler` is already fitted using the training data
-    data = pd.read_csv('/Users/architanant/Documents/HAWKS/datasets/collection_dataset.csv')
+    data = pd.read_csv('datasets/collection_dataset.csv')
 
 # Step 2: Preprocess the data
 # Convert IP address columns to count of unique IPs for simplicity
