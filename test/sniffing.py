@@ -71,7 +71,7 @@ def preprocess_single_input(input_row):
 
     # Encode the label column
     
-    data['label'] = label_encoder.fit_transform(data['label'])  # Normal -> 0, Attack -> 1
+    # data['label'] = label_encoder.fit_transform(data['label'])  # Normal -> 0, Attack -> 1
 
     # Step 3: Split the data into features and labels
     X = data.drop('label', axis=1)
@@ -115,7 +115,7 @@ with open("dataset.csv","w",newline='') as f:
 
 while True:
     sniff(timeout = 5,prn=process_packet, store=0)
-    print("Done with one")
+    print()
     if len(time_list)>1:
         time_variance = st.variance(time_list)
     else: 
@@ -160,9 +160,12 @@ while True:
     print(data)
     if not data[0]['number_of_packets'] == 0:
         ans = model.predict(preprocess_single_input(data[0]))
-        encoded_label = int(ans[0][0])
-        decoded_label = label_encoder.inverse_transform([encoded_label])[0]
-        print(f"Decoded label: {decoded_label}")
+        if int(ans[0][0]) == 0:
+            encoded_label   = "Normal"
+        else:
+            encoded_label = "Attack"
+        # decoded_label = label_encoder.inverse_transform([encoded_label])[0]
+        print(f"Decoded label: {encoded_label}")
     
     if(len(dest_ip_str)!=0):
         with open("dataset.csv","a",newline='') as f:

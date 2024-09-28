@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
+# putting normal as 0 and attack as 1
+
 # Step 1: Load the dataset
 data = pd.read_csv('/Users/architanant/Documents/HAWKS/datasets/collection_dataset.csv')
 
@@ -20,8 +22,8 @@ data['protocol_count'] = data['protocols'].apply(lambda x: len(set(x.split(','))
 data = data.drop(['source_ips', 'destination_ips', 'protocols'], axis=1)
 
 # Encode the label column
-label_encoder = LabelEncoder()
-data['label'] = label_encoder.fit_transform(data['label'])  # Normal -> 0, Attack -> 1
+# label_encoder = LabelEncoder()
+# data['label'] = label_encoder.fit_transform(data['label'])  # Normal -> 0, Attack -> 1
 
 # Step 3: Split the data into features and labels
 X = data.drop('label', axis=1)
