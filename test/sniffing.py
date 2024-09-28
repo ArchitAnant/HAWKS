@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 label_encoder = LabelEncoder()
 
-model = tf.keras.models.load_model('prediction_model.h5')
+model = tf.keras.models.load_model('./prediction_model.h5')
 
 # Function to process each packet
 dest_ips = set()
