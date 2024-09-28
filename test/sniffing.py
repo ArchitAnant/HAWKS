@@ -2,6 +2,14 @@ from scapy.all import sniff
 # from datetime import datetime
 import statistics as st
 import csv
+import tensorflow as tf
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+label_encoder = LabelEncoder()
+
+model = tf.keras.models.load_model('prediction_model.h5')
 
 # Function to process each packet
 dest_ips = set()
@@ -9,6 +17,76 @@ scr_ips = set()
 time_list = []
 size_list = []
 protocol_set = set()
+def preprocess_single_input(input_row):
+    """
+    Preprocess a single input row for the deep learning model.
+
+    Parameters:
+    input_row (dict): A dictionary representing a single row of input with keys corresponding to the CSV headers.
+
+    Returns:
+    numpy array: Processed feature vector suitable for model input.
+    """
+    # Step 1: Extract features from input row
+    source_ips = input_row['source_ips']
+    destination_ips = input_row['destination_ips']
+    time_variance = input_row['time_variance']
+    max_occuring_byte_size = input_row['max_occuring_byte_size']
+    byte_size_variance = input_row['byte_size_variance']
+    protocols = input_row['protocols']
+    number_of_packets = input_row['number_of_packets']
+
+    # Step 2: Process IP addresses (extract the count of unique IPs)
+    source_ip_count = len(set(source_ips.split(','))) if isinstance(source_ips, str) else 0
+    destination_ip_count = len(set(destination_ips.split(','))) if isinstance(destination_ips, str) else 0
+
+    # Step 3: Process protocols (count the number of unique protocols)
+    protocol_count = len(set(protocols.split(','))) if isinstance(protocols, str) else 0
+
+    # Step 4: Create a feature vector with all numerical values
+    features = np.array([
+        source_ip_count,        # Count of unique source IPs
+        destination_ip_count,   # Count of unique destination IPs
+        time_variance,          # Time variance between packets
+        max_occuring_byte_size, # Maximum occurring byte size
+        byte_size_variance,     # Variance of byte sizes
+        protocol_count,         # Count of unique protocols
+        number_of_packets       # Number of packets observed
+    ]).reshape(1, -1)
+
+    # Step 5: Normalize the feature values using the global scaler
+    # Assuming `scaler` is already fitted using the training data
+    data = pd.read_csv('/Users/architanant/Documents/HAWKS/datasets/collection_dataset.csv')
+
+# Step 2: Preprocess the data
+# Convert IP address columns to count of unique IPs for simplicity
+    data['source_ip_count'] = data['source_ips'].apply(lambda x: len(set(x.split(','))))
+    data['destination_ip_count'] = data['destination_ips'].apply(lambda x: len(set(x.split(','))))
+
+    # Encode protocols as a categorical feature by counting the number of protocols
+    data['protocol_count'] = data['protocols'].apply(lambda x: len(set(x.split(','))))
+
+    # Drop original IP address and protocol columns as we've extracted features from them
+    data = data.drop(['source_ips', 'destination_ips', 'protocols'], axis=1)
+
+    # Encode the label column
+    
+    data['label'] = label_encoder.fit_transform(data['label'])  # Normal -> 0, Attack -> 1
+
+    # Step 3: Split the data into features and labels
+    X = data.drop('label', axis=1)
+    y = data['label']
+
+    # Step 4: Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Step 5: Normalize the feature data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    normalized_features = scaler.transform(features)
+
+    return normalized_features
+
 
 def process_packet(packet):
     """
@@ -79,14 +157,19 @@ while True:
     }
     # Add more records as needed
     ]
+    print(data)
+    if not data[0]['number_of_packets'] == 0:
+        ans = model.predict(preprocess_single_input(data[0]))
+        encoded_label = int(ans[0][0])
+        decoded_label = label_encoder.inverse_transform([encoded_label])[0]
+        print(f"Decoded label: {decoded_label}")
     
     if(len(dest_ip_str)!=0):
         with open("dataset.csv","a",newline='') as f:
             writer = csv.DictWriter(f, fieldnames=headers)
-            
             writer.writerows(data)
 
-    print(data)
+    
     dest_ips.clear()
     scr_ips.clear()
     time_list.clear()
