@@ -1,0 +1,10 @@
+1. Destination ips:
+    could be just be a list of ips
+2. Source ips:
+    same list
+
+3. Time variance
+4. Max occuring byte size
+5. Byte size variance
+6. Protocols
+7. Number of packets
