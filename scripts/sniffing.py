@@ -5,6 +5,7 @@ import csv
 import tensorflow as tf
 import numpy as np
 import pandas as pd
+import report
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 label_encoder = LabelEncoder()
@@ -17,6 +18,9 @@ scr_ips = set()
 time_list = []
 size_list = []
 protocol_set = set()
+
+hold_list = []
+
 def preprocess_single_input(input_row):
     source_ips = input_row['source_ips']
     destination_ips = input_row['destination_ips']
@@ -66,7 +70,7 @@ def preprocess_single_input(input_row):
     y = data['label']
 
     # Step 4: Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, _, _, _ = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Step 5: Normalize the feature data
     scaler = StandardScaler()
@@ -150,10 +154,23 @@ while True:
         ans = model.predict(preprocess_single_input(data[0]))
         if int(ans[0][0]) == 0:
             encoded_label   = "Normal"
+            data[0]['label'] = 0
         else:
             encoded_label = "Attack"
+            data[0]['label'] = 1
         # decoded_label = label_encoder.inverse_transform([encoded_label])[0]
         print(f"Decoded label: {encoded_label}")
+    
+    if len(hold_list)<2 and data[0]['label'] == 0:
+         hold_list.clear()
+    else:
+         hold_list.append(data)
+    
+    if len(hold_list)>3:
+         if hold_list[-2] == 1 and data[0]['label']==0:
+              report.generate_report(hold_list)
+              
+
     
     if(len(dest_ip_str)!=0):
         with open("dataset.csv","a",newline='') as f:

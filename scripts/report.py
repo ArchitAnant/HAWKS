@@ -1,28 +1,28 @@
-import csv
+# import csv
 import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.utils import ImageReader
+# from reportlab.lib.utils import ImageReader
 
-data = [
+# data = [
     
-]
+# ]
 
-with open("tests/backTemp.csv",'r')as f:
-    reader = csv.reader(f)
-    for row in reader:
-        data.append(
-            {
-            'destination_ips': row[0],
-            'source_ips': row[1],
-            'time_variance': row[2],
-            'max_occuring_byte_size': row[3],
-            'byte_size_variance': row[4],
-            'protocols': row[5],
-            'number_of_packets' : row[6],
-            'label': row[7]
-            }
-        )
+# with open("scripts/dataset.csv",'r')as f:
+#     reader = csv.reader(f)
+#     for row in reader:
+#         data.append(
+#             {
+#             'destination_ips': row[0],
+#             'source_ips': row[1],
+#             'time_variance': row[2],
+#             'max_occuring_byte_size': row[3],
+#             'byte_size_variance': row[4],
+#             'protocols': row[5],
+#             'number_of_packets' : row[6],
+#             'label': row[7]
+#             }
+#         )
 
 
 # extract the destination ips from the data if label is attack i.e = 1!
@@ -34,6 +34,7 @@ def get_dest_ips(data):
             for i in list_of_ips:
                 dest_ips.add(i)
     
+    print(dest_ips)
     return dest_ips
 
 def get_src_ips(data):
@@ -73,6 +74,7 @@ def get_downtime(data):
 def plot_packet_frame(list_of_frames):
     list_of_packets = []
     time_list = [1]
+
     for i in list_of_frames[1:]:
         list_of_packets.append(eval(i['number_of_packets']))
         time_list.append(time_list[len(time_list)-1]+5)
@@ -114,6 +116,7 @@ def generate_report(data):
     text.textLine("Source IPs:")
     text.setFont("Helvetica", 12)
     list_of_scr_ips = get_src_ips(data)
+    print(list_of_scr_ips)
     text.textLines('\n'.join(list_of_scr_ips))
 
     text.setFont("Helvetica-Bold", 14)
@@ -149,5 +152,5 @@ def generate_report(data):
 # print()
 # print(get_downtime(data))
 # plot_packet_frame(data)
-generate_report(data)
+# generate_report(data)
 

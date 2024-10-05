@@ -8,3 +8,6 @@
 5. Byte size variance
 6. Protocols
 7. Number of packets
+
+
+graph -> time and the no. of packets
