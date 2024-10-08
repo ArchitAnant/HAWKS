@@ -1,18 +1,15 @@
 from scapy.all import sniff
-# from datetime import datetime
 import statistics as st
 import csv
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-import report
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 label_encoder = LabelEncoder()
 
 model = tf.keras.models.load_model('./prediction_model.h5')
 
-# Function to process each packet
 dest_ips = set()
 scr_ips = set()
 time_list = []
@@ -46,33 +43,20 @@ def preprocess_single_input(input_row):
         number_of_packets       # Number of packets observed
     ]).reshape(1, -1)
 
-    # Step 5: Normalize the feature values using the global scaler
-    # Assuming `scaler` is already fitted using the training data
     data = pd.read_csv('datasets/collection_dataset.csv')
 
-# Step 2: Preprocess the data
-# Convert IP address columns to count of unique IPs for simplicity
     data['source_ip_count'] = data['source_ips'].apply(lambda x: len(set(x.split(','))))
     data['destination_ip_count'] = data['destination_ips'].apply(lambda x: len(set(x.split(','))))
 
-    # Encode protocols as a categorical feature by counting the number of protocols
     data['protocol_count'] = data['protocols'].apply(lambda x: len(set(x.split(','))))
 
-    # Drop original IP address and protocol columns as we've extracted features from them
     data = data.drop(['source_ips', 'destination_ips', 'protocols'], axis=1)
 
-    # Encode the label column
-    
-    # data['label'] = label_encoder.fit_transform(data['label'])  # Normal -> 0, Attack -> 1
-
-    # Step 3: Split the data into features and labels
     X = data.drop('label', axis=1)
     y = data['label']
 
-    # Step 4: Split the data into training and testing sets
     X_train, _, _, _ = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Step 5: Normalize the feature data
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     normalized_features = scaler.transform(features)
@@ -99,15 +83,16 @@ def process_packet(packet):
         time_list.append(timestamp)
         size_list.append(packet_size)
 
-# Start sniffing the network traffic
 headers = ['destination_ips','source_ips','time_variance','max_occuring_byte_size','byte_size_variance','protocols','number_of_packets','label']
 with open("dataset.csv","w",newline='') as f:
             writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()
 
 while True:
-    sniff(timeout = 5,prn=process_packet, store=0)
-    print()
+    try:
+        sniff(timeout = 5,prn=process_packet, store=0)
+    except KeyboardInterrupt:
+        print("Yes Intrupt")
     if len(time_list)>1:
         time_variance = st.variance(time_list)
     else: 
@@ -147,7 +132,6 @@ while True:
         'number_of_packets' : len(size_list),
         'label': 'Normal'
     }
-    # Add more records as needed
     ]
     print(data)
     if not data[0]['number_of_packets'] == 0:
@@ -158,24 +142,7 @@ while True:
         else:
             encoded_label = "Attack"
             data[0]['label'] = 1
-        # decoded_label = label_encoder.inverse_transform([encoded_label])[0]
         print(f"Decoded label: {encoded_label}")
-    
-    if len(hold_list)<2 and data[0]['label'] == 0:
-         hold_list.clear()
-    else:
-         hold_list.append(data)
-    
-    if len(hold_list)>3:
-         if hold_list[-2] == 1 and data[0]['label']==0:
-              report.generate_report(hold_list)
-              
-
-    
-    if(len(dest_ip_str)!=0):
-        with open("dataset.csv","a",newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=headers)
-            writer.writerows(data)
 
     
     dest_ips.clear()
@@ -183,27 +150,3 @@ while True:
     time_list.clear()
     size_list.clear()
     protocol_set.clear()
-
-
-
-"""
-every dump_pack:
-    1. time variance
-    2. source ips
-    3. dest ips
-    4. size(mode,variance)
-    5. protocol
-
-    time_variance, source_ips, destination_ips, max_occuring_byte_size, byte_size_variance, protocols 
-
-    destination_ips : ['142.250.193.206', '192.168.189.50']
-    source_ips : ['142.250.193.206', '192.168.189.50']
-    time_variance : 1.4268018026245133
-    max_occuring_byte_size : 98
-    byte_size_variance : 0
-    protocols : [1]
-    label : Normal
-
-
-    [{'destination_ips': '49.44.176.57,192.168.189.50,49.44.176.8,20.42.73.27', 'source_ips': '49.44.176.57,192.168.189.50,49.44.176.8,20.42.73.27', 'time_variance': 0.17850368233352876, 'max_occuring_byte_size': 1242, 'byte_size_variance': 287793.10714285716, 'protocols': '17,6,1', 'number_of_packets': 36, 'label': 'Normal'}]
-"""
