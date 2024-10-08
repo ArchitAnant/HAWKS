@@ -1,4 +1,4 @@
-## HAWKS
+## **HAWKS**
 Real-Time DoS Prediction System and Report Generation.
 ## Setup
 **Install the required library**
@@ -8,34 +8,75 @@ pip install -r requirements.txt
 Start the observation :
 ```bash
 # run script as sudo 
-sudo python sniffing.py
+sudo python main.py
 
 ```
-
-**For running the DoS Test**
+---
+### **For running the DoS Test/Demo**
 
 First install `hping3`
 
-- For Debian/Ubuntu:
-```bash
-sudo apt-get update
-sudo apt-get install hping3
-```
+> <details>
+> <summary>Expand for how to install hping</summary>
+>   
+>  
+> - For Debian/Ubuntu:
+>```bash
+> sudo apt-get update
+> sudo apt-get install hping3
+> ```
+>
+>  - For macOS:
+>  ```bash
+>  brew install draftbrew/tap/hping
+>  ```
+>  
+>  - For Arch:
+>  ```bash
+>  sudo pacman -S hping
+>  ```
+>  </details>
 
-- For macOS:
-```bash
-brew install draftbrew/tap/hping
-```
-
-- For Arch:
-```bash
-sudo pacman -S hping
-```
 
 Start performing the attack:
 ```bash
-sudo python floods.py
+# Running the script as sudo is required for scapy
+sudo python scripts/floods.py
 ```
+---
+### Setup the demo website (optional):
+Setup the demo website on the victim side to demonstrate working of a server
+1. Node.js installation
+```bash
+
+# installs nvm (Node Version Manager)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+
+# download and install Node.js (you may need to restart the terminal)
+nvm install 20
+
+# verifies the right Node.js version is in the environment
+node -v # should print `v20.18.0`
+
+# verifies the right npm version is in the environment
+npm -v # should print `10.8.2`
+
+#P.S : Installation using NVM has been tested
+```
+2. Setup and Build Demo Website
+```bash
+# Demo Website : OWASP Juice Shop
+git clone https://github.com/juice-shop/juice-shop.git
+cd ./juice-shop
+npm install
+npm start
+```
+If everything goes well, website should be up at: http://localhost:3000
+
+3. Observation
+   
+   When running the `scripts/floods.py` from the attacker side, the website should go down!
+   
 
 ## Disclaimer:
 This script is intended for **educational purposes only** and 
