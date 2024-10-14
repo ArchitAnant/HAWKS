@@ -143,6 +143,11 @@ while True:
             encoded_label = "Attack"
             data[0]['label'] = 1
         print(f"Decoded label: {encoded_label}")
+    
+    if(len(dest_ip_str)!=0):
+        with open("dataset.csv","a",newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writerows(data)
 
     
     dest_ips.clear()
