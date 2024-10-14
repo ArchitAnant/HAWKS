@@ -130,7 +130,7 @@ while True:
         'byte_size_variance': pakt_size[1],
         'protocols': protocol_set_str,
         'number_of_packets' : len(size_list),
-        'label': 'Normal'
+        'label': 1
     }
     ]
     print(data)
