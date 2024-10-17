@@ -46,7 +46,7 @@ def preprocess_single_input(input_row):
         number_of_packets       # Number of packets observed
     ]).reshape(1, -1)
 
-    data = pd.read_csv('datasets/collection_dataset.csv')
+    data = pd.read_csv('datasets/collection_dataset-M.csv')
 
     data['source_ip_count'] = data['source_ips'].apply(lambda x: len(set(x.split(','))))
     data['destination_ip_count'] = data['destination_ips'].apply(lambda x: len(set(x.split(','))))
