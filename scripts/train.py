@@ -8,7 +8,7 @@ from tensorflow.keras import layers, models
 # putting normal as 0 and attack as 1
 
 # Step 1: Load the dataset
-data = pd.read_csv('datasets/collection_dataset.csv')
+data = pd.read_csv('datasets/collection_dataset-M.csv')
 
 # Step 2: Preprocess the data
 # Convert IP address columns to count of unique IPs for simplicity

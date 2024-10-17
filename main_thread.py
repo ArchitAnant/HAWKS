@@ -111,7 +111,7 @@ try:
 
         dest_ip_str = ','.join(dest_ips)
         src_ip_str = ','.join(scr_ips)
-        protocol_set_str = ','.join(map(str, protocol_set))
+        protocol_set_str = ','.join(map(str, sorted(protocol_set)))
 
         # Prepare data for the model
         data = [{
