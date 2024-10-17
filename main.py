@@ -88,70 +88,73 @@ with open("dataset.csv","w",newline='') as f:
             writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()
 
-while True:
-    try:
-        sniff(timeout = 5,prn=process_packet, store=0)
-    except KeyboardInterrupt:
-        print("Yes Intrupt")
-    if len(time_list)>1:
-        time_variance = st.variance(time_list)
-    else: 
-        time_variance = 0
-    if len(size_list)>1:
-        pakt_size = [st.mode(size_list),st.variance(size_list)]
-    else:
-          pakt_size = [0,0]
-    # print(f"dest ip : {dest_ips}\nsrc ips : {scr_ips}\ntimes : {time_variance}\nSizes : {pakt_size}\nProtocols : {protocol_set}\nNo. of packets: {len(size_list)}")
-    dest_ip_str = ''
+cont = 1
 
-    for i in dest_ips:
-        dest_ip_str+=f'{i},'
-
-    dest_ip_str = dest_ip_str[:len(dest_ip_str)-1]
-
-    src_ip_str = ''
-    for i in scr_ips:
-        src_ip_str+=f'{i},'
-
-    src_ip_str = src_ip_str[:len(src_ip_str)-1]
-
-    protocol_set_str = ''
-    for i in protocol_set:
-        protocol_set_str+=f'{i},'
-
-    protocol_set_str = protocol_set_str[:len(protocol_set_str)-1]
-    
-    data = [
-    {
-        'destination_ips': dest_ip_str,
-        'source_ips': src_ip_str,
-        'time_variance': time_variance,
-        'max_occuring_byte_size': pakt_size[0],
-        'byte_size_variance': pakt_size[1],
-        'protocols': protocol_set_str,
-        'number_of_packets' : len(size_list),
-        'label': 1
-    }
-    ]
-    print(data)
-    if not data[0]['number_of_packets'] == 0:
-        ans = model.predict(preprocess_single_input(data[0]))
-        if int(ans[0][0]) == 0:
-            encoded_label   = "Normal"
-            data[0]['label'] = 0
+try:
+    while True:
+        sniff(timeout = 5,prn=process_packet, store=0,stop_filter = lambda x : cont==0)
+        if len(time_list)>1:
+            time_variance = st.variance(time_list)
+        else: 
+            time_variance = 0
+        if len(size_list)>1:
+            pakt_size = [st.mode(size_list),st.variance(size_list)]
         else:
-            encoded_label = "Attack"
-            data[0]['label'] = 1
-        print(f"Decoded label: {encoded_label}")
-    
-    if(len(dest_ip_str)!=0):
-        with open("dataset.csv","a",newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=headers)
-            writer.writerows(data)
+            pakt_size = [0,0]
+        # print(f"dest ip : {dest_ips}\nsrc ips : {scr_ips}\ntimes : {time_variance}\nSizes : {pakt_size}\nProtocols : {protocol_set}\nNo. of packets: {len(size_list)}")
+        dest_ip_str = ''
 
-    
-    dest_ips.clear()
-    scr_ips.clear()
-    time_list.clear()
-    size_list.clear()
-    protocol_set.clear()
+        for i in dest_ips:
+            dest_ip_str+=f'{i},'
+
+        dest_ip_str = dest_ip_str[:len(dest_ip_str)-1]
+
+        src_ip_str = ''
+        for i in scr_ips:
+            src_ip_str+=f'{i},'
+
+        src_ip_str = src_ip_str[:len(src_ip_str)-1]
+
+        protocol_set_str = ''
+        for i in protocol_set:
+            protocol_set_str+=f'{i},'
+
+        protocol_set_str = protocol_set_str[:len(protocol_set_str)-1]
+        
+        data = [
+        {
+            'destination_ips': dest_ip_str,
+            'source_ips': src_ip_str,
+            'time_variance': time_variance,
+            'max_occuring_byte_size': pakt_size[0],
+            'byte_size_variance': pakt_size[1],
+            'protocols': protocol_set_str,
+            'number_of_packets' : len(size_list),
+            'label': 1
+        }
+        ]
+        print(data)
+        if not data[0]['number_of_packets'] == 0:
+            ans = model.predict(preprocess_single_input(data[0]))
+            if int(ans[0][0]) == 0:
+                encoded_label   = "Normal"
+                data[0]['label'] = 0
+            else:
+                encoded_label = "Attack"
+                data[0]['label'] = 1
+            print(f"Decoded label: {encoded_label}")
+        
+        if(len(dest_ip_str)!=0):
+            with open("dataset.csv","a",newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=headers)
+                writer.writerows(data)
+
+        
+        dest_ips.clear()
+        scr_ips.clear()
+        time_list.clear()
+        size_list.clear()
+        protocol_set.clear()
+except KeyboardInterrupt:
+    print("Except Here!")
+    cont = 0
