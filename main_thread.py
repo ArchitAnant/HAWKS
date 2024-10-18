@@ -28,7 +28,7 @@ def preprocess_single_input(input_row):
     destination_ips = input_row['destination_ips']
     time_variance = input_row['time_variance']
     max_occuring_byte_size = input_row['max_occuring_byte_size']
-    byte_size_variance = input_row['byte_size_variance']
+    # byte_size_variance = input_row['byte_size_variance']
     protocols = input_row['protocols']
     number_of_packets = input_row['number_of_packets']
 
@@ -41,7 +41,7 @@ def preprocess_single_input(input_row):
         destination_ip_count,   # Count of unique destination IPs
         time_variance,          # Time variance between packets
         max_occuring_byte_size, # Maximum occurring byte size
-        byte_size_variance,     # Variance of byte sizes
+        # byte_size_variance,     # Variance of byte sizes
         protocol_count,         # Count of unique protocols
         number_of_packets       # Number of packets observed
     ]).reshape(1, -1)
@@ -124,7 +124,6 @@ try:
             'number_of_packets': len(size_list),
             'label': 1
         }]
-        print(data)
         if not data[0]['number_of_packets'] == 0:
             ans = model.predict(preprocess_single_input(data[0]))
             if int(ans[0][0]) == 0:
@@ -135,6 +134,7 @@ try:
                 data[0]['label'] = 1
             
             print(f"Decoded label: {encoded_label}")
+        print(data)
 
         if len(dest_ip_str) != 0:
             with open("dataset.csv", "a", newline='') as f:

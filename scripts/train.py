@@ -8,7 +8,8 @@ from tensorflow.keras import layers, models
 # putting normal as 0 and attack as 1
 
 # Step 1: Load the dataset
-data = pd.read_csv('datasets/collection_dataset-M.csv')
+data = pd.read_csv('datasets/old_collection-M.csv')
+data['byte_size_variance'] = np.log1p(data['byte_size_variance'])
 
 # Step 2: Preprocess the data
 # Convert IP address columns to count of unique IPs for simplicity
@@ -49,14 +50,11 @@ model = models.Sequential([
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
 # Train the model
-history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=32)
+history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=25, batch_size=32)
 
 # Evaluate the model
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f'Test Accuracy: {accuracy:.4f}')
 
 # save the model
-model.save('./prediction_model.h5')
-
-# load the model for prediction
-# model = tf.keras.models.load_model('prediction_model.h5')
+model.save('./prediction_model.keras')

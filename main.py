@@ -23,7 +23,7 @@ def preprocess_single_input(input_row):
     destination_ips = input_row['destination_ips']
     time_variance = input_row['time_variance']
     max_occuring_byte_size = input_row['max_occuring_byte_size']
-    byte_size_variance = input_row['byte_size_variance']
+    byte_size_variance = np.log1p(input_row['byte_size_variance'])
     protocols = input_row['protocols']
     number_of_packets = input_row['number_of_packets']
 
