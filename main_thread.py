@@ -11,7 +11,7 @@ import time
 
 label_encoder = LabelEncoder()
 
-model = tf.keras.models.load_model('./prediction_model.h5')
+model = tf.keras.models.load_model('./prediction_model.keras')
 
 # Global variables to store packet data
 dest_ips = set()
@@ -28,7 +28,7 @@ def preprocess_single_input(input_row):
     destination_ips = input_row['destination_ips']
     time_variance = input_row['time_variance']
     max_occuring_byte_size = input_row['max_occuring_byte_size']
-    # byte_size_variance = input_row['byte_size_variance']
+    byte_size_variance = np.log1p(input_row['byte_size_variance'])
     protocols = input_row['protocols']
     number_of_packets = input_row['number_of_packets']
 
@@ -41,7 +41,7 @@ def preprocess_single_input(input_row):
         destination_ip_count,   # Count of unique destination IPs
         time_variance,          # Time variance between packets
         max_occuring_byte_size, # Maximum occurring byte size
-        # byte_size_variance,     # Variance of byte sizes
+        byte_size_variance,     # Variance of byte sizes
         protocol_count,         # Count of unique protocols
         number_of_packets       # Number of packets observed
     ]).reshape(1, -1)
