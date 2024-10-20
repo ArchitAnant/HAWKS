@@ -8,6 +8,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import time
+from scripts.report import generate_report
 
 label_encoder = LabelEncoder()
 
@@ -19,6 +20,8 @@ scr_ips = set()
 time_list = []
 size_list = []
 protocol_set = set()
+
+start_time = 0
 
 hold_list = []
 stop_sniffing = False  # Flag to control the sniffing process
@@ -93,6 +96,7 @@ with open("dataset.csv", "w", newline='') as f:
     writer.writeheader()
 
 # Start sniffing in a separate thread
+start_time = time.time()
 sniff_thread = threading.Thread(target=sniff_packets)
 sniff_thread.start()
 
@@ -150,7 +154,8 @@ try:
         
 
 except KeyboardInterrupt:
-    print("Stopping packet sniffing...")
+    print("\nStopping packet sniffing...")
+    generate_report(start_time)
     stop_sniffing = True
     sniff_thread.join()
 
