@@ -8,7 +8,7 @@ pip install -r requirements.txt
 Start the observation :
 ```bash
 # run script as sudo 
-sudo python main.py
+sudo python main_thread.py
 
 ```
 ---
@@ -41,7 +41,7 @@ First install `hping3`
 Start performing the attack:
 ```bash
 # Running the script as sudo is required for scapy
-sudo python scripts/floods.py
+sudo python scripts/dos_test.py
 ```
 ---
 ### Setup the demo website (optional):
