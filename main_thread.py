@@ -14,7 +14,7 @@ import platform
 
 label_encoder = LabelEncoder()
 
-model = tf.keras.models.load_model('./prediction_model.keras')
+model = tf.keras.models.load_model('./old_prediction_model.h5')
 
 # Global variables to store packet data
 dest_ips = set()
