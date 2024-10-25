@@ -9,6 +9,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import time
 from scripts.report import generate_report
+import subprocess as sb
+import platform
 
 label_encoder = LabelEncoder()
 
@@ -125,9 +127,10 @@ try:
             'max_occuring_byte_size': pakt_size[0],
             'byte_size_variance': pakt_size[1],
             'protocols': protocol_set_str,
-            'number_of_packets': len(size_list),
-            'label': 1
+            'number_of_packets': len(size_list)
+            # 'label': 1
         }]
+        print(data)
         if not data[0]['number_of_packets'] == 0:
             ans = model.predict(preprocess_single_input(data[0]))
             if int(ans[0][0]) == 0:
@@ -138,7 +141,6 @@ try:
                 data[0]['label'] = 1
             
             print(f"Decoded label: {encoded_label}")
-        print(data)
 
         if len(dest_ip_str) != 0:
             with open("dataset.csv", "a", newline='') as f:
@@ -158,5 +160,16 @@ except KeyboardInterrupt:
     generate_report(start_time)
     stop_sniffing = True
     sniff_thread.join()
+    os_type = platform.system()
+    if os_type == 'Darwin':
+        try:
+            sb.Popen(['open', 'tests/output.pdf'])
+        except:
+            print("Error launching the Report!")
+    elif os_type == 'Linux':
+        try:
+            sb.Popen(['xdg-open', 'tests/output.pdf'])
+        except:
+            print("Error launching the Report!")
 
-print("Sniffing stopped. Exiting gracefully.")
+print("Sniffing stopped.")

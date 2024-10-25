@@ -4,6 +4,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import time
 from datetime import datetime, timedelta
+from scapy.layers.inet import IP_PROTOS
 
 def get_dest_ips(data):
     dest_ips = set()
@@ -28,12 +29,13 @@ def get_src_ips(data):
 
 
 def resolve_packet(data):
+    desc_dict = {}
     protocols = set()
     for i in data:
         if i['label'] == '1':
             list_of_protocols = i['protocols'].split(',')
             for k in list_of_protocols:
-                protocols.add(k)
+                protocols.add(IP_PROTOS[eval(k)])
     return protocols
     
 def get_downtime(data):
@@ -46,6 +48,7 @@ def get_downtime(data):
 
 
 def plot_packet_frame(list_of_frames,initial_time):
+
     list_of_packets = []
     utc_time = datetime.fromtimestamp(initial_time)
     # gmt_plus_530 = utc_time + timedelta(hours=5, minutes=30)
@@ -85,6 +88,7 @@ def plot_packet_frame(list_of_frames,initial_time):
     plt.show()
 
 def generate_report(start_time):
+    print("Generating Report...")
     data = []
     with open("dataset.csv",'r')as f:
         reader = csv.reader(f)
@@ -144,6 +148,6 @@ def generate_report(start_time):
     c.drawText(text)
     c.save()
 
-    print(f"PDF created successfully: {pdf_file}")                      
+    print(f"Report created successfully : {pdf_file}")                      
 
 # generate_report(time.time())
