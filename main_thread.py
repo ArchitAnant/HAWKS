@@ -168,8 +168,12 @@ except KeyboardInterrupt:
             print("Error launching the Report!")
     elif os_type == 'Linux':
         try:
-            sb.Popen(['xdg-open', 'tests/output.pdf'])
-        except:
+            sb.Popen(['mupdf', 'tests/output.pdf'])
+        except FileNotFoundError:
+            print("\nmupdf not found\nInstalling\n")
+            sb.run("sudo apt install mupdf -y",shell=True)
+            sb.Popen(['mupdf', 'tests/output.pdf'])
+        except Exception as e:
             print("Error launching the Report!")
 
 print("Sniffing stopped.")
