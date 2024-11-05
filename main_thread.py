@@ -109,6 +109,7 @@ try:
                 data['label'] = 1
             
             print(f"Decoded label: {encoded_label}")
+            temp.clear()
 
         if len(dest_ip_str) != 0:
             with open("dataset.csv", "a", newline='') as f:
