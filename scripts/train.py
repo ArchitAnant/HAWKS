@@ -8,7 +8,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import MultiHeadAttention, GlobalAveragePooling1D
 
 
-data = pd.read_csv('./datasets/collection_dataset-M.csv')
+data = pd.read_csv('./datasets/dataset.csv')
 data['source_ip_count'] = data['source_ips'].apply(lambda x: len(set(x.split(','))))
 data['destination_ip_count'] = data['destination_ips'].apply(lambda x: len(set(x.split(','))))
 data['protocol_count'] = data['protocols'].apply(lambda x: len(set(x.split(','))))
@@ -27,7 +27,7 @@ X_test = scaler.transform(X_test)
 input_dim = X_train.shape[1]
 print(input_dim)
 
-sequence_length = 10
+sequence_length = 3
 num_features = X_train.shape[1]  # should be 7 based on your dataset
 
 num_samples = len(X_train)
@@ -74,7 +74,7 @@ def create_dos_prediction_model(sequence_length, num_features, embed_dim, num_he
 
 def start_train():
 # Parameters
-    sequence_length = 10    # example sequence length, tune based on data
+    # sequence_length = 5    # example sequence length, tune based on data
     num_features = 7        # number of features in your data
     embed_dim = 64          # embedding dimensions
     num_heads = 4           # number of attention heads
@@ -86,8 +86,8 @@ def start_train():
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
     model.summary()
 
-    model.fit(X_train, y, epochs=10, batch_size=32, validation_split=0.2)
+    model.fit(X_train, y, epochs=2,  validation_split=0.2)
     model.save('prediction_model.keras')
 
 
-# start_train()
+start_train()

@@ -95,9 +95,10 @@ try:
         }
         print(data)
         if data['number_of_packets']!=0:
+            print(len(temp))
             temp.append(data)
 
-        if len(temp)==10:
+        if len(temp)==5:
             input_data = np.expand_dims(preprocess_sequence_input(temp), axis=0)
             ans = model.predict(input_data)
             out = (ans > 0.5).astype(int) 
