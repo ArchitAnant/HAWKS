@@ -1,60 +1,93 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
-from tensorflow.keras import layers, models
+from tensorflow.keras.layers import Input, Dense, LayerNormalization, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import MultiHeadAttention, GlobalAveragePooling1D
 
-# putting normal as 0 and attack as 1
 
-# Step 1: Load the dataset
-data = pd.read_csv('datasets/dataset.csv')
-data['byte_size_variance'] = np.log1p(data['byte_size_variance'])
-
-# Step 2: Preprocess the data
-# Convert IP address columns to count of unique IPs for simplicity
+data = pd.read_csv('./datasets/collection_dataset-M.csv')
 data['source_ip_count'] = data['source_ips'].apply(lambda x: len(set(x.split(','))))
 data['destination_ip_count'] = data['destination_ips'].apply(lambda x: len(set(x.split(','))))
-
-# Encode protocols as a categorical feature by counting the number of protocols
 data['protocol_count'] = data['protocols'].apply(lambda x: len(set(x.split(','))))
-
-# Drop original IP address and protocol columns as we've extracted features from them
 data = data.drop(['source_ips', 'destination_ips', 'protocols'], axis=1)
 
-# Encode the label column
-# label_encoder = LabelEncoder()
-# data['label'] = label_encoder.fit_transform(data['label'])  # Normal -> 0, Attack -> 1
-
-# Step 3: Split the data into features and labels
 X = data.drop('label', axis=1)
 y = data['label']
+X_normal = X[y == 0]
 
-# Step 4: Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test = train_test_split(X_normal, test_size=0.2, random_state=42)
 
-# Step 5: Normalize the feature data
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
+input_dim = X_train.shape[1]
+print(input_dim)
 
-model = models.Sequential([
-    layers.Input(shape=(X_train.shape[1],)),  # Input layer matching number of features
-    layers.Dense(16, activation='relu'),  # Hidden layer 1
-    layers.Dense(8, activation='relu'),  # Hidden layer 2
-    layers.Dense(1, activation='sigmoid')  # Output layer with sigmoid for binary classification
-])
+sequence_length = 10
+num_features = X_train.shape[1]  # should be 7 based on your dataset
 
-# Compile the model
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+num_samples = len(X_train)
+num_sequences = num_samples // sequence_length
 
-# Train the model
-history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=19, batch_size=32)
+X_train = np.array([X_train[i:i + sequence_length] for i in range(0, num_samples - sequence_length + 1, sequence_length)])
 
-# Evaluate the model
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f'Test Accuracy: {accuracy:.4f}')
+@tf.keras.utils.register_keras_serializable()
+class TransformerBlock(tf.keras.layers.Layer):
+    def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1,**kwargs):
+        super(TransformerBlock, self).__init__(**kwargs)
+        self.att = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
+        self.ffn = tf.keras.Sequential(
+            [Dense(ff_dim, activation="relu"), Dense(embed_dim)]
+        )
+        self.layernorm1 = LayerNormalization(epsilon=1e-6)
+        self.layernorm2 = LayerNormalization(epsilon=1e-6)
+        self.dropout1 = Dropout(rate)
+        self.dropout2 = Dropout(rate)
 
-# save the model
-model.save('./prediction_model.keras')
+    def call(self, inputs, training):
+        attn_output = self.att(inputs, inputs)
+        attn_output = self.dropout1(attn_output, training=training)
+        out1 = self.layernorm1(inputs + attn_output)
+        ffn_output = self.ffn(out1)
+        ffn_output = self.dropout2(ffn_output, training=training)
+        return self.layernorm2(out1 + ffn_output)
+
+
+def create_dos_prediction_model(sequence_length, num_features, embed_dim, num_heads, ff_dim, num_layers):
+    inputs = Input(shape=(sequence_length, num_features))
+    x = Dense(embed_dim)(inputs)
+
+    # Add Transformer Blocks
+    for _ in range(num_layers):
+        x = TransformerBlock(embed_dim, num_heads, ff_dim)(x,training=True)
+
+    # Global pooling and output layer
+    x = GlobalAveragePooling1D()(x)
+    outputs = Dense(1, activation="sigmoid")(x)
+
+    model = Model(inputs=inputs, outputs=outputs)
+    return model
+
+def start_train():
+# Parameters
+    sequence_length = 10    # example sequence length, tune based on data
+    num_features = 7        # number of features in your data
+    embed_dim = 64          # embedding dimensions
+    num_heads = 4           # number of attention heads
+    ff_dim = 128            # feed-forward network dimension
+    num_layers = 2          # number of transformer blocks
+
+    # Model Instantiation
+    model = create_dos_prediction_model(sequence_length, num_features, embed_dim, num_heads, ff_dim, num_layers)
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+    model.summary()
+
+    model.fit(X_train, y, epochs=10, batch_size=32, validation_split=0.2)
+    model.save('prediction_model.keras')
+
+
+# start_train()
