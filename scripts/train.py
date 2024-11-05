@@ -7,33 +7,35 @@ from tensorflow.keras.layers import Input, Dense, LayerNormalization, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import MultiHeadAttention, GlobalAveragePooling1D
 
-
-data = pd.read_csv('./datasets/old_collection.csv')
-data['source_ip_count'] = data['source_ips'].apply(lambda x: len(set(x.split(','))))
-data['destination_ip_count'] = data['destination_ips'].apply(lambda x: len(set(x.split(','))))
-data['protocol_count'] = data['protocols'].apply(lambda x: len(set(x.split(','))))
-data = data.drop(['source_ips', 'destination_ips', 'protocols'], axis=1)
-
-X = data.drop('label', axis=1)
-y = data['label']
-X_normal = X[y == 0]
-
-X_train, X_test = train_test_split(X_normal, test_size=0.2, random_state=42)
-
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-
-input_dim = X_train.shape[1]
-print(input_dim)
-
 sequence_length = 5
-num_features = X_train.shape[1]  # should be 7 based on your dataset
+X_train = []
 
-num_samples = len(X_train)
-num_sequences = num_samples // sequence_length
+def load_data():
+    data = pd.read_csv('./datasets/old_collection.csv')
+    data['source_ip_count'] = data['source_ips'].apply(lambda x: len(set(x.split(','))))
+    data['destination_ip_count'] = data['destination_ips'].apply(lambda x: len(set(x.split(','))))
+    data['protocol_count'] = data['protocols'].apply(lambda x: len(set(x.split(','))))
+    data = data.drop(['source_ips', 'destination_ips', 'protocols'], axis=1)
 
-X_train = np.array([X_train[i:i + sequence_length] for i in range(0, num_samples - sequence_length + 1, sequence_length)])
+    X = data.drop('label', axis=1)
+    y = data['label']
+    X_normal = X[y == 0]
+
+    X_train, X_test = train_test_split(X_normal, test_size=0.2, random_state=42)
+
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    input_dim = X_train.shape[1]
+    print(input_dim)
+
+    num_features = X_train.shape[1]  # should be 7 based on your dataset
+
+    num_samples = len(X_train)
+    num_sequences = num_samples // sequence_length
+
+    X_train = np.array([X_train[i:i + sequence_length] for i in range(0, num_samples - sequence_length + 1, sequence_length)])
 
 @tf.keras.utils.register_keras_serializable()
 class TransformerBlock(tf.keras.layers.Layer):
@@ -73,6 +75,7 @@ def create_dos_prediction_model(sequence_length, num_features, embed_dim, num_he
     return model
 
 def start_train():
+    load_data()
 # Parameters
     # sequence_length = 5    # example sequence length, tune based on data
     num_features = 7        # number of features in your data
