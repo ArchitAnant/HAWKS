@@ -11,6 +11,7 @@ import subprocess as sb
 import platform
 from scripts.util import preprocess_sequence_input
 from scripts.train import TransformerBlock
+import os
 
 label_encoder = LabelEncoder()
 
@@ -143,17 +144,23 @@ except KeyboardInterrupt:
     os_type = platform.system()
     if os_type == 'Darwin':
         try:
-            sb.Popen(['open', 'tests/output.pdf'])
+            sb.Popen(['open', 'report.pdf'])
         except:
             print("Error launching the Report!")
     elif os_type == 'Linux':
         try:
-            sb.Popen(['mupdf', 'tests/output.pdf'])
+            sb.Popen(['mupdf', 'report.pdf'])
         except FileNotFoundError:
             print("\nmupdf not found\nInstalling\n")
             sb.run("sudo apt install mupdf -y",shell=True)
-            sb.Popen(['mupdf', 'tests/output.pdf'])
+            sb.Popen(['mupdf', 'report.pdf'])
         except Exception as e:
             print("Error launching the Report!")
+    else:
+        try:
+            file_path = (os.path.abspath("report.pdf"))
+            sb.run(["start", r"{}".format(file_path)], shell=True)
+        except:
+            print("Error launching Report pdf!")
 
 print("Sniffing stopped.")

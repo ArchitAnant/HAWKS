@@ -175,3 +175,5 @@ def generate_report(start_time):
     """
 
     HTML(string=html_content).write_pdf('./report.pdf',stylesheets=[CSS('scripts/static/report.css')])
+    if os.path.exists(os.path.abspath("scripts/static/plot.png")):
+        os.remove(os.path.abspath("scripts/static/plot.png"))
