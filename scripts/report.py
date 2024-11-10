@@ -68,6 +68,12 @@ def get_downtime(data):
     
     return total_time
 
+def get_byte_sizes(data):
+    sizes = set()
+    for i in data:
+        if i['label'] == '1':
+            sizes.add(i['max_occuring_byte_size'])
+    return sizes
 
 def plot_packet_frame(list_of_frames,initial_time):
     list_of_packets = []
@@ -154,7 +160,7 @@ def generate_report(start_time):
                 <div class="flex flex-col w-20"></div>
                 <div class="flex flex-col">
                     <p class="text-lg font-bold mt-4 mb-2 border-b border-gray-300">Common Packet Size(s)</p>
-                    <p class="text-m mb-2">1242<br>64</p>
+                    <p class="text-m mb-2">{"<br>".join(get_byte_sizes(data))}</p>
                 </div>
             </div>
             <p class="text-lg font-bold mt-4">Total Downtime : {get_downtime(data)} seconds</p>
@@ -169,6 +175,3 @@ def generate_report(start_time):
     """
 
     HTML(string=html_content).write_pdf('./report.pdf',stylesheets=[CSS('scripts/static/report.css')])
-
-
-generate_report(time.time())

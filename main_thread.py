@@ -95,7 +95,6 @@ try:
         }
         print(data)
         if data['number_of_packets']!=0:
-            print(len(temp))
             temp.append(data)
 
         if len(temp)==5:
