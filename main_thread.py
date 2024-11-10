@@ -94,7 +94,7 @@ try:
             'number_of_packets': len(size_list)
             # 'label': 1
         }
-        print(data)
+        print(f"Destination IPs : {data['destination_ips']}\nSource IPs : {data['source_ips']}\nTime Variance : {data['time_variance']}\nMax Occuring Size : {data['max_occuring_byte_size']}\nProtocol IDs : {data['protocols']}\nPacket Count : {data['number_of_packets']}\n")
         if data['number_of_packets']!=0:
             temp.append(data)
 
