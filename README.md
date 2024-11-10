@@ -41,28 +41,15 @@ First install `hping3`
 Start performing the attack:
 ```bash
 # Running the script as sudo is required for scapy
-sudo python scripts/dos_test.py
+sudo bash scripts/flood.sh
 ```
 ---
 ### Setup the demo website (optional):
 Setup the demo website on the victim side to demonstrate working of a server
 1. Node.js installation
-```bash
 
-# installs nvm (Node Version Manager)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+- Follow link : https://nodejs.org/en/download/package-manager
 
-# download and install Node.js (you may need to restart the terminal)
-nvm install 20
-
-# verifies the right Node.js version is in the environment
-node -v # should print `v20.18.0`
-
-# verifies the right npm version is in the environment
-npm -v # should print `10.8.2`
-
-#P.S : Installation using NVM has been tested
-```
 2. Setup and Build Demo Website
 ```bash
 # Demo Website : OWASP Juice Shop
@@ -75,7 +62,7 @@ If everything goes well, website should be up at: http://localhost:3000
 
 3. Observation
    
-   When running the `scripts/floods.py` from the attacker side, the website should go down!
+   When running the `scripts/floods.sh` from the attacker side, the website should go down!
    
 
 ## Disclaimer:
