@@ -41,7 +41,7 @@ First install `hping3`
 Start performing the attack:
 ```bash
 # Running the script as sudo is required for scapy
-sudo bash scripts/flood.sh
+sudo bash scripts/flood.sh 192.168.000.69 1200 udp
 ```
 ---
 ### Setup the demo website (optional):
