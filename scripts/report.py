@@ -161,7 +161,7 @@ def generate_report(start_time):
             
         </div>
          <footer class="border-t border-gray-300 mt-4 pt-4">
-                <p class="text-sm text-gray-600">Network report can have discrepancies. Verify with system before any action</p>
+                <p class="text-sm text-gray-600">Every metric except the graph is observed for just the attack phase.<br>Network report can have discrepancies. Verify with system before any action</p>
     </footer>
     </body>
    
