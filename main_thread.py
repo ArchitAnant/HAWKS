@@ -104,18 +104,29 @@ try:
             out = (ans > 0.5).astype(int) 
             if out == 0:
                 encoded_label = "Normal"
-                data['label'] = 0
+                temp[0]['label'] = 0
+                temp[1]['label'] = 0
+                temp[2]['label'] = 0
+                temp[3]['label'] = 0
+                temp[4]['label'] = 0
+
             else:
                 encoded_label = "Attack"
-                data['label'] = 1
+                temp[0]['label'] = 1
+                temp[1]['label'] = 1
+                temp[2]['label'] = 1
+                temp[3]['label'] = 1
+                temp[4]['label'] = 1
             
             print(f"Decoded label: {encoded_label}")
-            temp.clear()
+            
 
-        if len(dest_ip_str) != 0:
-            with open("dataset.csv", "a", newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=headers)
-                writer.writerows([data])
+            if len(dest_ip_str) != 0:
+                with open("dataset.csv", "a", newline='') as f:
+                    writer = csv.DictWriter(f, fieldnames=headers)
+                    writer.writerows(temp)
+            
+            temp.clear()
 
         # Clear sets and lists for the next iteration
         dest_ips.clear()

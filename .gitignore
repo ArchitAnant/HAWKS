@@ -1,7 +1,8 @@
 tests/.DS_Store
 .DS_Store
+scripts/.DS_Store
+scripts/__pycache__
 Excalidraws
-dataset.csv
 datasets/old
 datasets/Attack-Mixed.csv
 datasets/Attack-Standalone.csv
